@@ -1,0 +1,85 @@
+---
+title: "HW 01 - Earthquakes"
+author: "RUBRIC"
+date: "2/5/2023"
+output: html_document
+---
+
+## Load packages and data
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+library(openintro)
+```
+
+## Exercises
+
+### Exercise 1
+
+MAX 0.5 points
+Correct number of rows/earthquakes 0.5 points
+
+There are 123 earthquakes in the dataset.
+
+### Exercise 2
+
+MAX 0.5 points
+Correct number of variables
+
+There are 7 variables for each earthquake.
+
+### Exercise 3
+
+Max 0.5 points
+Correct countries identified 0.5 points
+
+Turkey, Iran and China
+
+### Exercise 4
+
+MAX 2.5 points
+Correct starting code copied 0.5 points
+Add pipe operator 0.5 points
+Add arrange function 0.5 points
+Add richter (with or without desc()) 0.5 points
+Include (reasonable) narrative description of results 0.5 points
+
+The code chunk below shows that the most common intensities for major earthquakes are 7.5 and 7.3, but range between 6.8 and 7.5.
+
+```{r earthquakes-top10, eval=TRUE}
+earthquakes %>% 
+  count(richter, sort = TRUE) %>% 
+  slice_max(n, n = 5) %>% 
+  arrange(desc(richter))
+```
+
+OR
+
+```{r earthquakes-top10, eval=TRUE}
+earthquakes %>% 
+  count(richter, sort = TRUE) %>% 
+  slice_max(n, n = 5) %>% 
+  arrange(richter)
+```
+
+### Exercise 5
+
+MAX 1 points
+0.5 "no relationship"
+0.5 "no relationship between magnitude and year" (or similar, but must include variable names)
+
+No relationship. 
+
+Therefore, there is no relationship between earthquake magnitude and year of occurence during the 20th century. 
+
+### Exercise 6
+
+MAX 0.5 points
+
+0.5 No, because the timing of large earthquakes does not seem to correspond to the timing of high death tolls.
+
+### Exercise 7
+
+MAX 0.5 points
+
+0.5 More confident, because this plot shows **more clearly** that high magnitude earthquakes do not always cause large death tolls.

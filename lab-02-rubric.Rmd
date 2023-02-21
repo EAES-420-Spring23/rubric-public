@@ -1,0 +1,158 @@
+---
+title: "Lab 02 - Plastic waste"
+author: "RUBRIC"
+date: "Spring 2023"
+output: github_document
+---
+
+## Load packages and data
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+```
+
+```{r load-data, message=FALSE}
+plastic_waste <- read_csv("data/plastic-waste.csv")
+```
+
+## Exercises
+
+**MAX GRADE: 10 points**
+
+### Exercise 1
+
+MAX 1.5 point
+0.5 for correct dataset, aesethetic and geom
+0.5 for correct use of facet_wrap or facet_grid
+0.5 for reasonable interpretation 
+
+E.g., reference to outliers (North america), more values close to zero (Africa and/or Oceania), overall similarity among continents  
+
+```{r plastic-waste-continent}
+plastic_waste %>% 
+  ggplot(aes(x = plastic_waste_per_cap)) +
+  geom_histogram() +
+  facet_wrap(~continent)
+```
+
+### Exercise 2
+
+MAX 1
+0.5 for copying code
+0.5 for lowering the alpha value below 0.7
+
+```{r plastic-waste-density}
+ggplot(data = plastic_waste, 
+       mapping = aes(x = plastic_waste_per_cap, 
+                     color = continent, 
+                     fill = continent)) +
+  geom_density(alpha = 0.2)
+```
+
+### Exercise 3
+
+MAX 1 point
+0.5 for mapping
+0.5 for setting
+
+We want color and fill aesthetics to vary BY continent
+We want alpha to be applied (set) for all continents
+
+### Exercise 4
+
+MAX 1.5 points
+0.5 for adapting the code for violin plots
+0.5 for distribution comment
+0.5 for summary stat identification (any of below)
+
+Violin plots (as with density plots) show the distribution of the data, rather than just the summary statistics shown in a box plot.
+Box plots show the median AND/OR 1st and 3rd quartile range AND/OR outliers.
+
+```{r plastic-waste-violin}
+ggplot(data = plastic_waste, 
+       mapping = aes(x = continent, 
+                     y = plastic_waste_per_cap)) +
+  geom_violin()
+```
+
+### Exercise 5
+
+MAX 1.5 points
+0.5 correct dataset and x/y mapping
+0.5 correct gom
+0.5 reasonable interpretation
+
+"there is a general positive relatioship between plastic waste per capita and managed waste per capita, but the relationship is messy"
+
+```{r plastic-waste-mismanaged}
+plastic_waste %>% 
+  ggplot(aes(x = plastic_waste_per_cap, y = mismanaged_plastic_waste_per_cap)) +
+  geom_point()
+```
+
+### Exercise 6
+
+Max 1 points
+0.5 add color mapping to continent
+0.5 reasonable interpretation
+
+"there is no clear by-continent relationship"
+"there may be slightly different relationships for each continent, but not easy to see"
+"asia and africa seem to have steeper relationships (more unmanaged waste per unit waste) than europe"
+
+```{r plastic-waste-mismanaged-continent}
+plastic_waste %>% 
+  ggplot(aes(x = plastic_waste_per_cap, 
+             y = mismanaged_plastic_waste_per_cap,
+             color = continent)) +
+  geom_point()
+```
+
+### Exercise 7
+
+Max 1.5 points
+0.5 for first chunk (correct x/y mapping)
+0.5 for second chunk (correct x/y mapping)
+0.5 for interpretation
+
+"there seems to be a stronger association with coastal population than with total population"
+
+```{r plastic-waste-population-total}
+plastic_waste %>% 
+  ggplot(aes(x = total_pop, 
+             y = plastic_waste_per_cap,
+             color = continent)) +
+  geom_point()
+```
+
+```{r plastic-waste-population-coastal}
+plastic_waste %>% 
+  ggplot(aes(x = coastal_pop, 
+             y = plastic_waste_per_cap,
+             color = continent)) +
+  geom_point()
+```
+
+### Exercise 8
+
+MAX 1 point
+0.5 for copying/recreating the plot accurately
+0.5 for reasonable interpreation
+
+"there seems to be a positive relationship between plastic waste per capita and the proprtion of a country's popluation that lives near the coast"
+
+```{r recreate-viz}
+plastic_waste %>% 
+  mutate(coastal_pop_prop = coastal_pop / total_pop) %>%
+  filter(plastic_waste_per_cap < 3) %>%
+  ggplot(aes(x = coastal_pop_prop, y = plastic_waste_per_cap, color = continent)) + 
+    geom_point() +
+    geom_smooth(color = "black") +
+    scale_color_viridis_d() +
+    labs(x = "Coastal population proportion (Coastal / total population)", 
+         y = "Plastic waste per capita ", 
+         color = "Continent",
+         title = "Plastic waste vs. coastal population proportion",
+         subtitle = "by continent") +
+    theme_minimal()
+```

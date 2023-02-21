@@ -1,0 +1,149 @@
+---
+title: "HW 02 - Water and Sanitation - Answer Key"
+author: "RUBRIC"
+date: "Spring 2023"
+output: html_document
+---
+
+## Load packages and data
+
+```{r load-packages-data, message = FALSE}
+library(tidyverse)
+wat_san <- read_csv("data/water-and-sanitation.csv")
+```
+
+## Exercises
+
+**MAX GRADE: 10 points**
+
+### Exercise 1
+
+MAX 1.5 points
+0.5 for nrow
+0.5 for ncol
+0.5 for in-line code
+
+The are `r nrow(wat_san)` observations and `r ncol(wat_san)` variables in our dataset.
+
+### Exercise 2
+
+MAX 0.5 points
+0.5 for intepretation
+
+Each row in the dataset is water and sanitation access stats for one year for a given country.
+
+### Exercise 3
+
+MAX 1.5 points
+0.5 for correct code
+0.5 for reasonable bin width (needs to be wide >> 1 to see)
+0.5 for interpretation
+
+"The distribution has moved closer to zero since 2000, meaning more countries now have 0% of the population with no sanitation access"
+OR
+"... meaning sanitation access has improved"
+OR
+"The number of countries where no-sanitation is equal to 0% of the population has increased"
+
+```{r no-sanitation-years, echo = F}
+ggplot(data = wat_san, mapping = aes(x = sanitation_none)) +
+  geom_histogram(binwidth = 10) +
+  facet_wrap(~Year)
+```
+
+### Exercise 4
+
+MAX 1.5 point
+0.5 for correct pipeline
+0.5 for slice
+0.5 for interpretation
+
+"There appears to be no relationship between zero saniation and zero clean water access"
+
+```{r bottom-5-2000}
+wat_san %>% 
+  filter(Year == 2000) %>% 
+  arrange(desc(sanitation_none)) %>% 
+  slice(1:5)
+```
+
+### Exercise 5
+
+Max 1 point
+0.5 for scatter plot 
+0.5 for interpretation
+
+"Yes, this also shows there is no clear relationship, lots of scatter, not a straight line"
+
+```{r all-2000-plot}
+wat_san %>% 
+  filter(Year == 2000) %>% 
+  ggplot(aes(x = water_none, y = sanitation_none)) +
+  geom_point()
+```
+
+### Exercise 6
+
+Max 1 point
+0.5 for correct code (slice optional)
+0.5 for interpretation
+
+Yes, several changes:
+Added in 2020: Chad, South Sudan, Benin, Namibia
+Removed in 2020: India, Ethiopia, Eritrea, Cambodia
+
+```{r bottom-5-2020}
+wat_san %>% 
+  filter(Year == 2020) %>% 
+  arrange(desc(sanitation_none)) %>% 
+  slice(1:5)
+```
+
+### Exercise 7
+
+Max 1.5 points
+0.5 for copying code chunk
+0.5 for completing code chunk
+0.5 for interpretation
+
+"Overall, water and sanitation access has improved (no access declined), however rates of sanitation_none are still higher than water_none"
+
+```{r progress-summary}
+  wat_san %>% 
+  filter(Year == 2000 & Entity != "World" | Year == 2020 & Entity != "World") %>% 
+  # this line uses a combination of logical operators (== (equal to), & (and), != (is not equal to), | (or))
+  # this combination filters for the two years provided, while excluding any data associated with the "World" Entity
+  group_by(Year) %>% 
+  # this line groups all the data by Year, so that any summary statistics specified below are computed for each group
+  summarize(water_none_min = min(water_none, na.rm = T),
+            water_none_mean = mean(water_none, na.rm = T),
+            water_none_median = median(water_none, na.rm = T),
+            water_none_stdev = sd(water_none, na.rm = T),
+            water_none_iqr = IQR(water_none, na.rm = T),
+            water_none_max = max(water_none, na.rm = T),
+            
+            sanitation_none_min = min(sanitation_none, na.rm = T),
+            sanitation_none_mean = mean(sanitation_none, na.rm = T),
+            sanitation_none_median = median(sanitation_none, na.rm = T),
+            sanitation_none_stdev = sd(sanitation_none, na.rm = T),
+            sanitation_none_iqr = IQR(sanitation_none, na.rm = T),
+            sanitation_none_max = max(sanitation_none, na.rm = T)
+            )
+```
+
+### Exercise 8
+
+Max 1.5 points
+0.5 for adding countries to fiter
+0.5 for completing aes mappings
+0.5 for interpretation
+
+Sanitation_none declined rapidly in India and Cambodia between 2000 and 2020.
+Sanitation_none declined slowly in Eritrea and Niger, so this is why Niger stayed in the top five with high Sanitation_none access.
+
+```{r country-global-changes}
+wat_san %>% 
+  filter(Entity == "World" | Entity == "India" | Entity == "Cambodia" | Entity == "Niger" | Entity == "Eritrea") %>% 
+  ggplot(aes(x = Year, y = sanitation_none, color = Entity)) +
+  geom_line()
+```
